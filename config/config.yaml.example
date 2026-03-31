@@ -1,0 +1,40 @@
+# 监控代币列表
+symbols:
+  - BTC
+  - BNB
+  - SOL
+  - ETH
+
+# 时间周期: 1h=1小时, 4h=4小时, 1d=1天
+timeframes:
+  - 1h
+  - 4h
+  - 1d
+
+# 均线周期 (建议: [20, 60, 120])
+ma_periods: [20, 60, 120]
+
+# 均线密集度阈值 (%)
+ma_density_threshold:
+  spread_bull: 3.0    # 极差率阈值 - 牛市模式
+  spread_bear: 1.5   # 极差率阈值 - 熊市模式
+  std_bull: 2.0      # 标准差阈值 - 牛市模式
+  std_bear: 1.0      # 标准差阈值 - 熊市模式
+
+# 连续密集K线根数要求 (建议: 3)
+consecutive_days: 3
+
+# 检查间隔(秒)，建议 >= 30
+check_interval: 30
+
+# 告警重置时间(小时)，0表示不重置
+alert_reset_hours: 6
+
+# Telegram配置
+# 获取方式:
+# 1. 创建机器人: @BotFather 发送 /newbot
+# 2. 获取 Bot Token
+# 3. 获取 Chat ID: @userinfobot 发送任意消息
+telegram:
+  bot_token: "YOUR_BOT_TOKEN"
+  chat_id: "YOUR_CHAT_ID"

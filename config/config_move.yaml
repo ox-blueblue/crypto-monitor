@@ -1,0 +1,20 @@
+# 监控代币
+symbols:
+  - BTC
+  - BNB
+  - SOL
+  - ETH
+
+# 时间周期: 5d=5天, 10d=10天, 20d=20天等
+timeframes:
+  - 5d
+  - 10d
+  - 20d
+
+# 每日计算时间
+calculate_time: "7:50"
+
+# Telegram配置
+telegram:
+  bot_token: "8642052689:AAE2UvQyCDohNd9_eHbgi88nZ6vRbeKuvVU"
+  chat_id: "6815195231"

@@ -29,7 +29,7 @@ def create_parser():
         epilog="""
 示例:
   python3 main.py              # 默认运行
-  python3 main.py help         # 显示帮助
+  python3 main.py -h           # 显示帮助
   python3 main.py -b           # 熊市模式
   python3 main.py -i 600       # 自定义间隔
         """
@@ -39,13 +39,6 @@ def create_parser():
 def parse_args():
     """解析命令行参数"""
     parser = create_parser()
-    parser.add_argument(
-        "command",
-        nargs="?",
-        choices=["help"],
-        default="run",
-        help="help: 显示帮助"
-    )
     parser.add_argument(
         "-c", "--config",
         default=None,
@@ -68,10 +61,6 @@ def parse_args():
 def main():
     """主函数"""
     args = parse_args()
-    
-    if args.command == "help":
-        create_parser().print_help()
-        return
     
     if args.interval is not None and args.interval <= 0:
         logger.error("检查间隔必须大于0")

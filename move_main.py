@@ -92,8 +92,13 @@ class MomentumCalculator:
                 logger.warning(f"{symbol} 数据不足，period={period}")
                 return (symbol, 0.0, 0.0, 0.0)
             
-            current_price = float(candles[0][4])
-            past_price = float(candles[period][4])
+            timestamps = [int(c[0]) for c in candles]
+            if timestamps != sorted(timestamps):
+                logger.warning(f"{symbol} K线时间未按升序排列，跳过计算")
+                return (symbol, 0.0, 0.0, 0.0)
+            
+            current_price = float(candles[-1][4])
+            past_price = float(candles[-1 - period][4])
             
             if past_price == 0:
                 return (symbol, current_price, past_price, 0.0)
@@ -136,14 +141,8 @@ def format_message(results: Dict[int, List[Tuple[str, float, float, float]]]) ->
         lines.append(f"⏱️ {period}天动量排行")
         lines.append(f"{'币种':<6} {'涨跌幅':>10} {'当前价格':>14} {'前' + str(period) + '天':>14}")
         
-        medals = ["🥇", "🥈", "🥉"]
-        for i, (symbol, current_price, past_price, momentum) in enumerate(data):
-            if i < 3:
-                prefix = medals[i]
-            else:
-                prefix = "   "
-            
-            lines.append(f"{prefix} {symbol:<5} {momentum:>10.2f}% {current_price:>14,.2f} {past_price:>14,.2f}")
+        for i, (symbol, current_price, past_price, momentum) in enumerate(data):    
+            lines.append(f" {symbol:<5} {momentum:>10.2f}% {current_price:>14,.2f} {past_price:>14,.2f}")
         
         lines.append("")
     
@@ -177,7 +176,12 @@ def main():
     config = MoveConfig()
     run_time = config.calculate_time
     
-    schedule.every().day.at(run_time).do(run_momentum_task)
+    parts = run_time.split(":")
+    hour = parts[0].zfill(2)
+    minute = parts[1] if len(parts) > 1 else "00"
+    formatted_time = f"{hour}:{minute}"
+    
+    schedule.every().day.at(formatted_time).do(run_momentum_task)
     logger.info(f"已设置每天 {run_time} 执行动量计算")
     
     run_momentum_task()

@@ -12,7 +12,7 @@ timeframes:
   - 20d
 
 # 每日计算时间
-calculate_time: "7:50"
+calculate_time: "8:01"
 
 # Telegram配置
 telegram:

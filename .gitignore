@@ -49,7 +49,7 @@ logs/
 Thumbs.db
 
 # 项目配置 (包含敏感信息)
-config.yaml
+*.yaml
 *.log
 
 # 其他

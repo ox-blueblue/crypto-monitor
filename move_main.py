@@ -133,7 +133,8 @@ def format_message(results: Dict[int, List[Tuple[str, float, float, float]]]) ->
     lines.append(f"📈 动量监控报告 ({datetime.now().strftime('%Y-%m-%d')})")
     lines.append("")
     
-    for period, data in reversed(results.items()):
+    for period in sorted(results.keys(), reverse=True):
+        data = results[period]
         lines.append(f"⏱️ {period}天动量排行")
         lines.append(f"{'币种':<6} {'涨跌幅':>10} {'当前价格':>14} {'前' + str(period) + '天':>14}")
         

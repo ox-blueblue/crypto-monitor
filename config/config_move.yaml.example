@@ -11,9 +11,6 @@ timeframes:
   - 10d
   - 20d
 
-# 每日计算时间
-calculate_time: "08:01"
-
 # Telegram配置
 telegram:
   bot_token: ""

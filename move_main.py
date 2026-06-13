@@ -3,15 +3,15 @@
 动量监控程序
 
 功能:
-- 每天7:50计算各交易对过去5天、10天、20天的动量
+- 单次计算各交易对过去5天、10天、20天的动量
 - 按周期排序后通过Telegram发送
+
+定时执行由系统 cron 负责。
 """
 
 import os
 import sys
 import yaml
-import time
-import schedule
 from datetime import datetime
 from typing import List, Dict, Tuple
 from loguru import logger
@@ -53,10 +53,6 @@ class MoveConfig:
         """从 '5d', '10d', '20d' 解析为 [5, 10, 20]"""
         tfs = self._config.get("timeframes", ["5d", "10d", "20d"])
         return [int(tf.replace("d", "")) for tf in tfs]
-    
-    @property
-    def calculate_time(self) -> str:
-        return self._config.get("calculate_time", "7:50")
     
     @property
     def telegram_bot_token(self) -> str:
@@ -170,25 +166,9 @@ def run_momentum_task():
 
 
 def main():
-    """主函数"""
+    """主函数：执行一次动量计算任务。"""
     logger.info("动量监控程序启动")
-    
-    config = MoveConfig()
-    run_time = config.calculate_time
-    
-    parts = run_time.split(":")
-    hour = parts[0].zfill(2)
-    minute = parts[1] if len(parts) > 1 else "00"
-    formatted_time = f"{hour}:{minute}"
-    
-    schedule.every().day.at(formatted_time).do(run_momentum_task)
-    logger.info(f"已设置每天 {run_time} 执行动量计算")
-    
     run_momentum_task()
-    
-    while True:
-        schedule.run_pending()
-        time.sleep(60)
 
 
 if __name__ == "__main__":

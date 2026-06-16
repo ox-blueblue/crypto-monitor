@@ -14,6 +14,11 @@ import sys
 import yaml
 from datetime import datetime
 from typing import List, Dict, Tuple
+
+
+def sort_periods_for_notification(periods: List[int]) -> List[int]:
+    """通知展示周期排序：长周期优先，确保20天排在5天/10天前面。"""
+    return sorted(periods, reverse=True)
 from loguru import logger
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -133,7 +138,7 @@ def format_message(results: Dict[int, List[Tuple[str, float, float, float]]]) ->
     lines.append(f"📈 动量监控报告 ({datetime.now().strftime('%Y-%m-%d')})")
     lines.append("")
     
-    for period in sorted(results.keys(), reverse=True):
+    for period in sort_periods_for_notification(list(results.keys())):
         data = results[period]
         lines.append(f"⏱️ {period}天动量排行")
         lines.append(f"{'币种':<6} {'涨跌幅':>10} {'当前价格':>14} {'前' + str(period) + '天':>14}")

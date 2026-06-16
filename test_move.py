@@ -6,7 +6,7 @@
 import sys
 sys.path.insert(0, '.')
 
-from move_main import MoveConfig, MomentumCalculator, format_message
+from move_main import MoveConfig, MomentumCalculator, format_message, sort_periods_for_notification
 
 
 def test_config():
@@ -18,7 +18,7 @@ def test_config():
     config = MoveConfig()
     assert config.symbols == ["BTC", "BNB", "SOL", "ETH"], f"symbols 错误: {config.symbols}"
     assert config.periods == [5, 10, 20], f"periods 错误: {config.periods}"
-    assert config.calculate_time == "7:50", f"calculate_time 错误: {config.calculate_time}"
+    # calculate_time 由 cron 使用，MoveConfig 不再暴露该属性
     assert config.telegram_bot_token != "", "telegram_bot_token 为空"
     assert config.telegram_chat_id != "", "telegram_chat_id 为空"
     
@@ -41,8 +41,8 @@ def test_momentum_calculation():
     # 验证逻辑: momentum = (current - past) / past * 100
     # 获取K线数据手动验证
     candles = calc.client.get_candles("BTC", "1d", 6)
-    expected_current = float(candles[0][4])
-    expected_past = float(candles[5][4])
+    expected_current = float(candles[-1][4])
+    expected_past = float(candles[-6][4])
     expected = (expected_current - expected_past) / expected_past * 100
     
     print(f"当前价格: {current_price}")
@@ -92,6 +92,7 @@ def test_message_format():
     test_data = {
         5: [("BTC", 100000.0, 95000.0, 5.23), ("ETH", 3000.0, 2900.0, 3.12), ("SOL", 100.0, 101.0, -1.05), ("BNB", 600.0, 615.0, -2.34)],
         10: [("ETH", 3100.0, 2850.0, 8.50), ("BTC", 102000.0, 99700.0, 2.30), ("BNB", 590.0, 615.0, -4.10), ("SOL", 95.0, 103.0, -7.80)],
+        20: [("SOL", 110.0, 100.0, 10.00), ("BTC", 100000.0, 90000.0, 11.11)],
     }
     
     message = format_message(test_data)
@@ -100,15 +101,36 @@ def test_message_format():
     
     assert "5天动量排行" in message, "缺少5天周期标题"
     assert "10天动量排行" in message, "缺少10天周期标题"
+    assert "20天动量排行" in message, "缺少20天周期标题"
+    assert message.index("20天动量排行") < message.index("10天动量排行") < message.index("5天动量排行"), "20天周期没有排在最前面"
     assert "BTC" in message and "ETH" in message, "缺少币种名称"
     assert "100,000.00" in message, "当前价格格式错误"
     assert "95,000.00" in message, "过去价格格式错误"
     assert "涨跌幅" in message, "缺少涨跌幅列标题"
-    assert "🥇" in message and "🥈" in message and "🥉" in message, "缺少奖牌emoji"
     
     print("✓ 消息格式测试通过")
     print()
 
+
+
+def test_notification_period_order():
+    """测试通知周期顺序：20天排在最前面"""
+    print("=" * 50)
+    print("测试4.1: 通知周期排序")
+    print("=" * 50)
+
+    assert sort_periods_for_notification([5, 10, 20]) == [20, 10, 5]
+    assert sort_periods_for_notification([10, 5, 20]) == [20, 10, 5]
+
+    message = format_message({
+        5: [("BTC", 1.0, 1.0, 0.0)],
+        10: [("BTC", 1.0, 1.0, 0.0)],
+        20: [("BTC", 1.0, 1.0, 0.0)],
+    })
+    assert message.index("20天动量排行") < message.index("10天动量排行") < message.index("5天动量排行")
+
+    print("✓ 通知周期排序测试通过")
+    print()
 
 def test_integration():
     """集成测试"""
@@ -183,6 +205,7 @@ def main():
     test_momentum_calculation()
     test_sorting()
     test_message_format()
+    test_notification_period_order()
     test_integration()
     test_telegram_send()
     

@@ -106,7 +106,10 @@ def test_message_format():
     assert "BTC" in message and "ETH" in message, "缺少币种名称"
     assert "100,000.00" in message, "当前价格格式错误"
     assert "95,000.00" in message, "过去价格格式错误"
-    assert "涨跌幅" in message, "缺少涨跌幅列标题"
+    assert "涨跌" in message, "缺少涨跌列标题"
+    assert "涨跌幅" not in message, "不应再显示涨跌幅列标题"
+    assert "当前价格" not in message, "不应再显示当前价格列标题"
+    assert "现价" in message, "缺少现价列标题"
     
     print("✓ 消息格式测试通过")
     print()

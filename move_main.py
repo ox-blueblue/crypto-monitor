@@ -141,7 +141,7 @@ def format_message(results: Dict[int, List[Tuple[str, float, float, float]]]) ->
     for period in sort_periods_for_notification(list(results.keys())):
         data = results[period]
         lines.append(f"⏱️ {period}天动量排行")
-        lines.append(f"{'币种':<6} {'涨跌幅':>10} {'当前价格':>14} {'前' + str(period) + '天':>14}")
+        lines.append(f"{'币种':<6} {'涨跌':>10} {'现价':>14} {'前' + str(period) + '天':>14}")
         
         for i, (symbol, current_price, past_price, momentum) in enumerate(data):    
             lines.append(f" {symbol:<5} {momentum:>10.2f}% {current_price:>14,.2f} {past_price:>14,.2f}")

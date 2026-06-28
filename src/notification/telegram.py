@@ -49,7 +49,7 @@ class TelegramNotifier:
 
 📌 *{symbol}* ({timeframe})
 
-💰 当前价格: `${current_price:,.2f}`
+💰 现价: `${current_price:,.2f}`
 
 📊 均线密集度:
 • 极差率: `{result.ma_spread_rate:.2f}%`
